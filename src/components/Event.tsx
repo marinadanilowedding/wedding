@@ -63,7 +63,12 @@ const Event: React.FC<EventProps> = ({ setGameScore, scrollProgress, setCurrentS
   };
 
   const addToGoogleCalendar = () => {
-    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventDetails.title)}&dates=${eventDetails.startDate.replace(/[-:]/g, '').replace('.000', '')}/${eventDetails.endDate.replace(/[-:]/g, '').replace('.000', '')}&location=${encodeURIComponent(eventDetails.location)}&details=${encodeURIComponent(eventDetails.description)}`;
+    // Converte direttamente le date per Google Calendar (formato: YYYYMMDDTHHMMSS)
+    const startDateGoogle = eventDetails.startDate.replace(/[-:]/g, '');
+    const endDateGoogle = eventDetails.endDate.replace(/[-:]/g, '');
+    
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventDetails.title)}&dates=${startDateGoogle}/${endDateGoogle}&location=${encodeURIComponent(eventDetails.location)}&details=${encodeURIComponent(eventDetails.description)}`;
+    
     window.open(googleCalendarUrl, '_blank');
     setShowCalendarMenu(false);
     setGameScore(prev => prev + 2000);
@@ -77,7 +82,7 @@ const Event: React.FC<EventProps> = ({ setGameScore, scrollProgress, setCurrentS
   };
 
   const handleRSVP = async () => {
-    const endpoint = 'https://script.google.com/macros/s/AKfycbwoU5WpgsqbN7YOWDpgBjn1stpfQN_qsjcuQQXHiFw3xzcmvWkxcFNN0MJv2WaNvzT6pA/exec';
+    const endpoint = 'https://script.google.com/macros/s/AKfycbxmaEmH9eW8eZavDBQZGadN0Y20a9-dz0etz6_OJWb54fVa0V-eVWODJFe3TY5fetBQJg/exec';
 
     // Prepara i dati delle allergie per Excel con formato più semplice
     const allergiesData = rsvpData.allergies
@@ -427,12 +432,18 @@ const Event: React.FC<EventProps> = ({ setGameScore, scrollProgress, setCurrentS
               type="button"
             >
               <div className="flex flex-col sm:flex-row items-center gap-4">
-                <span className="text-4xl">📅</span>
+                <div className="text-center">
+                  <div className="text-white text-sm font-bold">OCT</div>
+                  <div className="bg-white text-red-600 px-2 py-1 rounded font-black text-xl">18</div>
+                </div>
                 <div>
                   <div className="text-2xl font-black text-yellow-400">ADD TO CALENDAR</div>
                   <div className="text-lg text-white">SAVE THE DATE!</div>
                 </div>
-                <span className="text-4xl">📅</span>
+                <div className="text-center">
+                  <div className="text-white text-sm font-bold">OCT</div>
+                  <div className="bg-white text-red-600 px-2 py-1 rounded font-black text-xl">18</div>
+                </div>
               </div>
             </button>
 
