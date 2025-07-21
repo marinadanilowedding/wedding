@@ -21,15 +21,31 @@ interface HomePageProps {
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ setCurrentScreen, setGameScore, stars, scrollProgress, gameScore, playerName, setPlayerName }) => {
-  const [inputName, setInputName] = React.useState(playerName);
+  const [firstName, setFirstName] = React.useState('');
+  const [lastName, setLastName] = React.useState('');
+
+  // Se abbiamo già un playerName salvato, lo dividiamo in nome e cognome
+  React.useEffect(() => {
+    if (playerName && !firstName && !lastName) {
+      const nameParts = playerName.split(' ');
+      if (nameParts.length >= 2) {
+        setFirstName(nameParts[0]);
+        setLastName(nameParts.slice(1).join(' '));
+      }
+    }
+  }, [playerName, firstName, lastName]);
 
   const handleStartGame = () => {
-    if (inputName.trim()) {
-      setPlayerName(inputName.trim());
+    if (firstName.trim() && lastName.trim()) {
+      const fullName = `${firstName.trim()} ${lastName.trim()}`;
+      setPlayerName(fullName);
       setGameScore(prev => prev + 1000);
       setCurrentScreen('menu');
     }
   };
+
+  const isFormValid = firstName.trim() && lastName.trim();
+
   return (
     <div className="min-h-screen bg-black relative overflow-hidden font-mono">
       {/* FONT RETRO GAMING IMPORTATO */}
@@ -150,7 +166,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setCurrentScreen, setGameSco
             </div>
           </div>
 
-          {/* BOX INSERIMENTO NOME FAMIGLIA */}
+          {/* BOX INSERIMENTO NOME E COGNOME */}
           <div className="max-w-2xl mx-auto mb-12 p-6 bg-black/90 border-4 border-green-400 backdrop-blur-sm">
             <div className="text-green-400 text-center">
               <div className="text-yellow-400 mb-4 text-xl font-bold">*** MARRIAGE EDITION ***</div>
@@ -162,21 +178,48 @@ export const HomePage: React.FC<HomePageProps> = ({ setCurrentScreen, setGameSco
               {!playerName ? (
                 <div className="mb-6">
                   <div className="text-cyan-400 text-xl font-bold mb-4">
-                    🎮 INSERISCI NOME FAMIGLIA PLAYER 🎮
+                    🎮 INSERISCI I TUOI DATI PLAYER 🎮
                   </div>
-                  <input
-                    type="text"
-                    value={inputName}
-                    onChange={(e) => setInputName(e.target.value)}
-                    placeholder="Es: Famiglia Rossi"
-                    className="w-full max-w-md px-4 py-3 bg-black/80 border-2 border-cyan-400 text-white text-center text-lg font-bold rounded-lg focus:border-yellow-400 focus:outline-none"
-                    onKeyPress={(e) => e.key === 'Enter' && handleStartGame()}
-                  />
+                  
+                  {/* Form Nome e Cognome */}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-cyan-300 text-sm font-bold mb-2">
+                        NOME *
+                      </label>
+                      <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="Il tuo nome"
+                        className="w-full max-w-md px-4 py-3 bg-black/80 border-2 border-cyan-400 text-white text-center text-lg font-bold rounded-lg focus:border-yellow-400 focus:outline-none"
+                        onKeyPress={(e) => e.key === 'Enter' && isFormValid && handleStartGame()}
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-cyan-300 text-sm font-bold mb-2">
+                        COGNOME *
+                      </label>
+                      <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Il tuo cognome"
+                        className="w-full max-w-md px-4 py-3 bg-black/80 border-2 border-cyan-400 text-white text-center text-lg font-bold rounded-lg focus:border-yellow-400 focus:outline-none"
+                        onKeyPress={(e) => e.key === 'Enter' && isFormValid && handleStartGame()}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="text-yellow-300 text-sm mt-4">
+                    * Campi obbligatori
+                  </div>
                 </div>
               ) : (
                 <div className="text-cyan-400 text-xl font-bold animate-pulse mb-4">
-                  Benvenuti, {playerName}! 
-                  <br />Ora potete unirvi al party! 🎉
+                  Benvenuto/a, {playerName}! 
+                  <br />Ora puoi unirti al party! 🎉
                 </div>
               )}
             </div>
@@ -197,9 +240,9 @@ export const HomePage: React.FC<HomePageProps> = ({ setCurrentScreen, setGameSco
           ) : (
             <button
               onClick={handleStartGame}
-              disabled={!inputName.trim()}
+              disabled={!isFormValid}
               className={`border-4 border-yellow-400 px-12 py-6 hover:scale-105 active:scale-95 transition-transform duration-100 cursor-pointer select-none ${
-                inputName.trim() 
+                isFormValid
                   ? 'bg-red-600 text-white' 
                   : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'
               }`}

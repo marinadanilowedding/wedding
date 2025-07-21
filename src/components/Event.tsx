@@ -23,7 +23,13 @@ const Event: React.FC<EventProps> = ({ setGameScore, scrollProgress, setCurrentS
   const [rsvpSubmitted, setRsvpSubmitted] = React.useState(false);
   const [rsvpData, setRsvpData] = React.useState({
     attending: '',
-    guestCount: 1
+    guestCount: 1,
+    allergies: [] as Array<{
+      guestNumber: number;
+      guestName: string;
+      allergies: string;
+      notes: string;
+    }>
   });
 
   const eventDetails = {
@@ -32,6 +38,28 @@ const Event: React.FC<EventProps> = ({ setGameScore, scrollProgress, setCurrentS
     endDate: '2025-10-18T23:00:00',
     location: 'Chiesa Beata Vergine Di Lourdes e S. Bernardetta, Via Lago Lucrino 1, 80147, NAPOLI, Italia',
     description: 'FINAL BOSS FIGHT! Player 1 & Player 2 completano la loro ultimate quest.'
+  };
+
+  // Funzione per aggiornare le allergie
+  const updateGuestAllergies = (guestIndex: number, field: string, value: string) => {
+    const updatedAllergies = [...rsvpData.allergies];
+    
+    // Se non esiste ancora l'oggetto per questo ospite, crealo
+    if (!updatedAllergies[guestIndex]) {
+      updatedAllergies[guestIndex] = {
+        guestNumber: guestIndex + 1,
+        guestName: '',
+        allergies: '',
+        notes: ''
+      };
+    }
+    
+    updatedAllergies[guestIndex] = {
+      ...updatedAllergies[guestIndex],
+      [field]: value
+    };
+    
+    setRsvpData({...rsvpData, allergies: updatedAllergies});
   };
 
   const addToGoogleCalendar = () => {
@@ -48,32 +76,50 @@ const Event: React.FC<EventProps> = ({ setGameScore, scrollProgress, setCurrentS
     setGameScore(prev => prev + 2000);
   };
 
-const handleRSVP = async () => {
-  const endpoint = 'https://script.google.com/macros/s/AKfycbxmaEmH9eW8eZavDBQZGadN0Y20a9-dz0etz6_OJWb54fVa0V-eVWODJFe3TY5fetBQJg/exec';
+  const handleRSVP = async () => {
+    const endpoint = 'https://script.google.com/macros/s/AKfycbwoU5WpgsqbN7YOWDpgBjn1stpfQN_qsjcuQQXHiFw3xzcmvWkxcFNN0MJv2WaNvzT6pA/exec';
 
-  const data = {
-    playerName,
-    attending: rsvpData.attending,
-    guestCount: rsvpData.guestCount
+    // Prepara i dati delle allergie per Excel con formato più semplice
+    const allergiesData = rsvpData.allergies
+      .filter((guest, index) => index < rsvpData.guestCount) // Solo ospiti effettivi
+      .map((guest, index) => {
+        if (!guest) return null;
+        
+        const guestName = guest.guestName || (index === 0 ? playerName.split(' ')[0] : `Ospite ${index + 1}`);
+        const allergies = guest.allergies || '';
+        const notes = guest.notes || '';
+        
+        // Se non ci sono allergie né note, non includere
+        if (!allergies && !notes) return null;
+        
+        // Formato per Excel: "Nome: allergie | note"
+        return `${guestName}: ${allergies}${allergies && notes ? ' | ' : ''}${notes}`;
+      })
+      .filter(Boolean); // Rimuovi valori null
+
+    const data = {
+      playerName,
+      attending: rsvpData.attending,
+      guestCount: rsvpData.guestCount,
+      allergies: allergiesData.length > 0 ? allergiesData.join('; ') : '' // Stringa unica per Excel
+    };
+
+    try {
+      await fetch(endpoint, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      setRsvpSubmitted(true);
+      setGameScore(prev => prev + (rsvpData.attending === 'yes' ? 3000 : 1000));
+
+    } catch (err: any) {
+      alert('Errore di rete: ' + err.message);
+    }
   };
-
-  try {
-    await fetch(endpoint, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
-    setRsvpSubmitted(true);
-    setGameScore(prev => prev + (rsvpData.attending === 'yes' ? 3000 : 1000));
-
-  } catch (err: any) {
-    alert('Errore di rete: ' + err.message);
-  }
-};
-
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden font-mono">
@@ -193,7 +239,7 @@ const handleRSVP = async () => {
             </div>
           </div>
 
-          {/* RSVP SECTION - NUOVO */}
+          {/* RSVP SECTION - CON ALLERGIE CORRETTE */}
           <div className="mt-12 max-w-4xl mx-auto bg-black/90 border-4 border-orange-400 p-8 backdrop-blur-sm">
             <h3 className="text-3xl font-black text-center mb-6 text-orange-400">🎯 CONFERMA PARTECIPAZIONE</h3>
             
@@ -243,13 +289,100 @@ const handleRSVP = async () => {
                     </label>
                     <select
                       value={rsvpData.guestCount}
-                      onChange={(e) => setRsvpData({...rsvpData, guestCount: parseInt(e.target.value)})}
+                      onChange={(e) => {
+                        const newCount = parseInt(e.target.value);
+                        setRsvpData({
+                          ...rsvpData, 
+                          guestCount: newCount,
+                          // Assicurati che l'array allergie abbia la lunghezza giusta
+                          allergies: rsvpData.allergies.slice(0, newCount)
+                        });
+                      }}
                       className="bg-black/80 border-2 border-orange-400 text-white px-4 py-2 rounded-lg text-lg font-bold focus:border-yellow-400 focus:outline-none"
                     >
                       {[1,2,3,4,5,6,7,8,9,10].map(num => (
                         <option key={num} value={num}>{num} {num === 1 ? 'persona' : 'persone'}</option>
                       ))}
                     </select>
+                  </div>
+                )}
+
+                {/* SEZIONE ALLERGIE E INTOLLERANZE */}
+                {rsvpData.attending === 'yes' && rsvpData.guestCount > 0 && (
+                  <div className="mb-8 text-left">
+                    <div className="bg-purple-900/50 border-4 border-purple-400 p-6 rounded-lg">
+                      <h4 className="text-2xl font-black text-purple-400 mb-4 text-center">
+                        🍽️ ALLERGIE E INTOLLERANZE 🍽️
+                      </h4>
+                      <div className="text-purple-100 text-center mb-6">
+                        Aiutaci a preparare un menù perfetto per tutti! 
+                        <br />
+                        <span className="text-yellow-400 text-sm">
+                          (Compila solo se ci sono allergie/intolleranze da segnalare)
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-6">
+                        {Array.from({ length: rsvpData.guestCount }, (_, index) => (
+                          <div key={index} className="bg-black/50 border-2 border-purple-600 p-4 rounded-lg">
+                            <div className="text-purple-300 font-bold mb-3 text-center">
+                              👤 PARTECIPANTE {index + 1}
+                              {index === 0 && ` (${playerName.split(' ')[0]})`}
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {/* Nome ospite (opzionale se non è il primo) */}
+                              {index > 0 && (
+                                <div className="md:col-span-2">
+                                  <label className="block text-purple-300 text-sm font-bold mb-2">
+                                    Nome (opzionale)
+                                  </label>
+                                  <input
+                                    type="text"
+                                    placeholder="Nome del partecipante"
+                                    value={rsvpData.allergies[index]?.guestName || ''}
+                                    onChange={(e) => updateGuestAllergies(index, 'guestName', e.target.value)}
+                                    className="w-full px-3 py-2 bg-black/80 border border-purple-400 text-white rounded focus:border-yellow-400 focus:outline-none"
+                                  />
+                                </div>
+                              )}
+                              
+                              {/* Allergie */}
+                              <div>
+                                <label className="block text-purple-300 text-sm font-bold mb-2">
+                                  🚫 Allergie/Intolleranze
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="es: Glutine, Lattosio, Noci..."
+                                  value={rsvpData.allergies[index]?.allergies || ''}
+                                  onChange={(e) => updateGuestAllergies(index, 'allergies', e.target.value)}
+                                  className="w-full px-3 py-2 bg-black/80 border border-purple-400 text-white rounded focus:border-yellow-400 focus:outline-none"
+                                />
+                              </div>
+                              
+                              {/* Note aggiuntive */}
+                              <div>
+                                <label className="block text-purple-300 text-sm font-bold mb-2">
+                                  📝 Note aggiuntive
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="es: Vegetariano, Vegano, altro..."
+                                  value={rsvpData.allergies[index]?.notes || ''}
+                                  onChange={(e) => updateGuestAllergies(index, 'notes', e.target.value)}
+                                  className="w-full px-3 py-2 bg-black/80 border border-purple-400 text-white rounded focus:border-yellow-400 focus:outline-none"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <div className="text-center mt-4 text-purple-200 text-sm">
+                        💡 <strong>Tip:</strong> Se qualcuno non ha allergie, lascia pure vuoto!
+                      </div>
+                    </div>
                   </div>
                 )}
                 
@@ -273,6 +406,12 @@ const handleRSVP = async () => {
                   Grazie {playerName} per aver confermato! 
                   {rsvpData.attending === 'yes' ? ' Vi aspettiamo! 💒' : ' Ci mancherete! 💙'}
                 </div>
+                {/* CORREZIONE: Check sicuro per allergie */}
+                {rsvpData.attending === 'yes' && rsvpData.allergies && rsvpData.allergies.some(guest => guest && (guest.allergies || guest.notes)) && (
+                  <div className="text-purple-300 mt-3">
+                    ✅ Allergie e preferenze alimentari registrate!
+                  </div>
+                )}
                 <div className="text-yellow-400 mt-4 font-bold">
                   +{rsvpData.attending === 'yes' ? '3000' : '1000'} PUNTI BONUS!
                 </div>
