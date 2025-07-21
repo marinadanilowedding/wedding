@@ -50,7 +50,7 @@ export const OurStory: React.FC<OurStoryProps> = ({ gameScore, scrollProgress, s
                 <div className="text-4xl font-black text-cyan-400 mb-2">PLAYER 1</div>
                 <div className="w-32 h-32 mx-auto border-4 border-pink-400 bg-pink-600 mb-4 relative overflow-hidden rounded-lg">
                   <img 
-                    src={`${process.env.PUBLIC_URL}/img/level1/marina.jpg`}
+                    src={`${process.env.PUBLIC_URL}/img/level1/marina.JPG`}
                     alt="Marina" 
                     className="w-full h-full object-cover"
                     style={{ imageRendering: 'pixelated' }}
@@ -94,7 +94,7 @@ export const OurStory: React.FC<OurStoryProps> = ({ gameScore, scrollProgress, s
                 <div className="text-4xl font-black text-purple-400 mb-2">PLAYER 2</div>
                 <div className="w-32 h-32 mx-auto border-4 border-blue-400 bg-blue-600 mb-4 relative overflow-hidden rounded-lg">
                   <img 
-                    src={`${process.env.PUBLIC_URL}/img/level1/danilo.jpg`}
+                    src={`${process.env.PUBLIC_URL}/img/level1/danilo.JPG`}
                     alt="Danilo" 
                     className="w-full h-full object-cover"
                     style={{ imageRendering: 'pixelated' }}

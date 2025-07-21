@@ -45,7 +45,7 @@ export const Timeline: React.FC<TimelineProps> = ({ gameScore, scrollProgress, s
       location: "Salerno", 
       photo: "🎄", 
       color: "from-purple-400 to-pink-400",
-      imageFile: "2.jpg"
+      imageFile: "2.JPG"
     },
     { 
       date: "2015", 
@@ -54,7 +54,7 @@ export const Timeline: React.FC<TimelineProps> = ({ gameScore, scrollProgress, s
       location: "Londra, UK", 
       photo: "🎡", 
       color: "from-blue-400 to-purple-400",
-      imageFile: "3.jpg"
+      imageFile: "3.JPG"
     },
     { 
       date: "2016", 
@@ -63,7 +63,7 @@ export const Timeline: React.FC<TimelineProps> = ({ gameScore, scrollProgress, s
       location: "Mergellina, Napoli", 
       photo: "🎮", 
       color: "from-green-400 to-blue-400",
-      imageFile: "4.jpg"
+      imageFile: "4.JPG"
     },
     { 
       date: "2017", 
@@ -72,7 +72,7 @@ export const Timeline: React.FC<TimelineProps> = ({ gameScore, scrollProgress, s
       location: "Mirabilandia, Ravenna", 
       photo: "🎢", 
       color: "from-yellow-400 to-green-400",
-      imageFile: "5.jpg"
+      imageFile: "5.JPG"
     },
     { 
       date: "2018", 
@@ -99,7 +99,7 @@ export const Timeline: React.FC<TimelineProps> = ({ gameScore, scrollProgress, s
       location: "Verona", 
       photo: "🌿", 
       color: "from-teal-400 to-cyan-400",
-      imageFile: "8.jpg"
+      imageFile: "8.JPG"
     },
     { 
       date: "Estate 2021", 
@@ -117,7 +117,7 @@ export const Timeline: React.FC<TimelineProps> = ({ gameScore, scrollProgress, s
       location: "Irlanda", 
       photo: "🌿", 
       color: "from-emerald-400 to-green-400",
-      imageFile: "10.jpg"
+      imageFile: "10.JPG"
     },
     { 
       date: "2022", 
@@ -135,7 +135,7 @@ export const Timeline: React.FC<TimelineProps> = ({ gameScore, scrollProgress, s
       location: "Roma", 
       photo: "🏛️", 
       color: "from-red-400 to-pink-400",
-      imageFile: "12.jpg"
+      imageFile: "12.JPG"
     },
     { 
       date: "Capodanno 2023", 
@@ -144,7 +144,7 @@ export const Timeline: React.FC<TimelineProps> = ({ gameScore, scrollProgress, s
       location: "Australia", 
       photo: "🌅", 
       color: "from-violet-400 to-purple-400",
-      imageFile: "13.jpg"
+      imageFile: "13.JPG"
     },
     { 
       date: "2024", 

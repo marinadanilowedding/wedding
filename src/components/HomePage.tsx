@@ -62,7 +62,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setCurrentScreen, setGameSco
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url('${process.env.PUBLIC_URL}/img/homepage/sfondo.jpeg')`,
+          backgroundImage: `url('${process.env.PUBLIC_URL}/img/homepage/sfondo.JPEG')`,
           filter: 'brightness(0.8) contrast(1.1)'
         }}
       >
