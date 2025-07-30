@@ -187,7 +187,6 @@ const Event: React.FC<EventProps> = ({ setGameScore, scrollProgress, setCurrentS
                   <div>• EQUIPMENT: SORRISO + ENERGIA</div>
                   <div>• <span className="text-green-400 font-bold">TERMINE CONFERMA:</span> Prima che leviamo l'ancora</div>
                   <div>• PARKING: AVAILABLE</div>
-                  <div className="text-green-400 mt-3">• MULTIPLAYER: RECOMMENDED!</div>
                 </div>
               </div>
 
